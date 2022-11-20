@@ -7,5 +7,4 @@ app.use(express.json());
 
 // routes
 app.use("/api", todoRouter);
-
 module.exports = app;

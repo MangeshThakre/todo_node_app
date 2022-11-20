@@ -74,19 +74,80 @@ const delete_todo = async (req, res) => {
 
 //create task
 const create_task = async (req, res) => {
-  const todo_id = req.body.todo_id;
-  const tasks = req.body.tasks;
+  const todoId = req.body.todoId;
+  const task = req.body.task;
+
   try {
-    const result = findByIdAndUpdate(todo_id, {});
+    const result = await todoModel.findByIdAndUpdate(todoId, {
+      $push: { tasks: { task } },
+    });
+    if (result) {
+      res
+        .status(201)
+        .json({ success: false, message: "successfult added new task" });
+      // status code for creating the resource
+    } else {
+      // 404 for not found
+      res.status(404).json({ success: true, message: "Not found" });
+    }
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
 // delete task
-const delete_task = async (req, res) => {};
+const delete_task = async (req, res) => {
+  const todoId = req.query.todoId;
+  const taskId = req.query.taskId;
+
+  if (!todoId || !taskId) {
+    return res.status(404).json({ success: true, message: "Invalid request" });
+  }
+
+  try {
+    const result = await todoModel.findOneAndUpdate(
+      { id: todoId },
+      { $pull: { tasks: { _id: taskId } } }
+    );
+    if (result) {
+      res
+        .status(202) // 202 is from accepeted
+        .json({ success: true, message: "successfuly removed the task" });
+    } else {
+      // 404 for not found
+      res.status(404).json({ success: true, message: "Not found" });
+    }
+  } catch (error) {
+    res.statsu(500).json({ success: false, message: error.message });
+  }
+};
+
 // update task
-const update_task = async (req, res) => {};
+const update_task = async (req, res) => {
+  const todoId = req.body.todoId;
+  const taskId = req.body.taskId;
+  const task = req.body.task;
+
+  if (!todoId || !taskId || !task) {
+    return res.status(400).json({ success: false, message: "Invalid request" });
+  }
+  try {
+    const result = await todoModel.findOneAndUpdate(
+      { _id: todoId, "tasks._id": taskId },
+      { $set: { "tasks.$.task": task } }
+    );
+    if (result) {
+      return res
+        .status(201)
+        .json({ success: true, message: "Successfuly Updated" });
+    } else {
+      // 404 for not found
+      return res.status(404).json({ success: true, message: "Not found" });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   create_todo,

@@ -15,10 +15,6 @@ const todoSchema = new Schema({
       task: {
         type: String,
         required: [true, "Please Enter Task"],
-        minLength: [
-          3,
-          "task Field requires more then or equal to 3 characters ",
-        ],
       },
       checked: { type: Boolean, default: false },
     }),
