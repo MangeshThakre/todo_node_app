@@ -13,12 +13,17 @@ const create_todo = async (req, res) => {
     const result = await todoInfo.save();
     res.status(201).json({ success: true, data: result });
   } catch (error) {
+    /// validation error
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
     // dublicate key error
     if (error.code === 11000) {
       return res
         .status(400)
         .json({ success: false, message: "Title Shoule Be Unique" });
     }
+    // internal server error
     res.status(500).json({ success: false, message: error.message });
   }
 };
@@ -35,9 +40,9 @@ const get_todos = async (req, res) => {
 
 // get todo
 const get_todo = async (req, res) => {
-  const todo_id = req.query.todo_id;
+  const { todoId } = req.params;
   try {
-    const result = await todoModel.findById(todo_id);
+    const result = await todoModel.findById(todoId);
     if (result) {
       return res.status(200).json({ success: true, data: result });
     } else {
@@ -47,77 +52,116 @@ const get_todo = async (req, res) => {
       });
     }
   } catch (error) {
+    /// show error if _id is invalid
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Resource not found , Invalid ${error.path}`,
+      });
+    }
     res.status(500).json({ successs: false, message: error.message });
   }
 };
 
 // delete todo
 const delete_todo = async (req, res) => {
-  const toto_id = req.query.todo_id;
+  const { totoId } = req.params;
   try {
-    const result = await todoModel.findByIdAndDelete(toto_id);
+    const result = await todoModel.findByIdAndDelete(totoId);
     if (result) {
       res.status(200).json({
         success: false,
         message: "Successfly deleted the todo",
       });
     } else {
-      res.status(500).json({
+      res.status(404).json({
         success: false,
         message: "The todo you are trying to delete is not available",
       });
     }
   } catch (error) {
+    /// show error if _id is invalid
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Resource not found , Invalid ${error.path}`,
+      });
+    }
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-//create task
+//create task/or multiple task
 const create_task = async (req, res) => {
   const todoId = req.body.todoId;
-  const task = req.body.task;
+  const tasksArr = req.body.tasks;
+
+  if (!todoId || !tasksArr) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request todoId and tasks are required",
+    });
+  }
 
   try {
-    const result = await todoModel.findByIdAndUpdate(todoId, {
-      $push: { tasks: { task } },
-    });
-    if (result) {
+    const todo = await todoModel.findById(todoId);
+    if (todo) {
+      todo.tasks.push(...tasksArr);
+      await todo.save();
+      // status code for creating the resource
       res
         .status(201)
-        .json({ success: false, message: "successfult added new task" });
-      // status code for creating the resource
+        .json({ success: false, message: "successfuly added new task" });
     } else {
       // 404 for not found
-      res.status(404).json({ success: true, message: "Not found" });
+      res.status(404).json({ success: false, message: "Not found" });
     }
   } catch (error) {
+    /// validation error
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    /// show error if _id is invalid
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Resource not found , Invalid ${error.path}`,
+      });
+    }
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
 // delete task
 const delete_task = async (req, res) => {
-  const todoId = req.query.todoId;
-  const taskId = req.query.taskId;
-
+  const { todoId, taskId } = req.params;
   if (!todoId || !taskId) {
-    return res.status(404).json({ success: true, message: "Invalid request" });
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request todoId and taskId are required",
+    });
   }
-
   try {
     const result = await todoModel.findOneAndUpdate(
-      { id: todoId },
+      { id: todoId, "tasks._id": taskId },
       { $pull: { tasks: { _id: taskId } } }
     );
     if (result) {
       res
-        .status(202) // 202 is from accepeted
+        .status(201) // 202 is from accepeted
         .json({ success: true, message: "successfuly removed the task" });
     } else {
       // 404 for not found
-      res.status(404).json({ success: true, message: "Not found" });
+      res.status(404).json({ success: false, message: "Resource Not found" });
     }
   } catch (error) {
+    /// show error if _id is invalid
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Resource not found , Invalid ${error.path}`,
+      });
+    }
     res.statsu(500).json({ success: false, message: error.message });
   }
 };
@@ -129,8 +173,12 @@ const update_task = async (req, res) => {
   const task = req.body.task;
 
   if (!todoId || !taskId || !task) {
-    return res.status(400).json({ success: false, message: "Invalid request" });
+    return res.status(400).json({
+      success: false,
+      message: "Invalid request  todoId, taskId and task are required",
+    });
   }
+
   try {
     const result = await todoModel.findOneAndUpdate(
       { _id: todoId, "tasks._id": taskId },
@@ -145,6 +193,13 @@ const update_task = async (req, res) => {
       return res.status(404).json({ success: true, message: "Not found" });
     }
   } catch (error) {
+    /// show error if _id is invalid
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Resource not found , Invalid ${error.path}`,
+      });
+    }
     return res.status(500).json({ success: false, message: error.message });
   }
 };

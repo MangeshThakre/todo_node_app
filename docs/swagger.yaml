@@ -1,0 +1,549 @@
+openapi: 3.0.0
+info:
+  title: Todo node app
+  description: todo app add multiple task - Mangesh Thakre
+  version: 1.0.0
+
+servers:
+  - url: "{protocol}://localhost:8081/api"
+    description: localhost version of app
+    variables:
+      protocol:
+        enum:
+          - http
+          - https
+        default: http
+
+paths:
+  # Todo
+
+  /get_todos:
+    get:
+      tags:
+        - Todo
+      summary: returns all todos                
+      responses:
+        "200": # status code
+          description: "returns an array of objects"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id : 
+                          type: string
+                        title:
+                          type: string
+                        tasks:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              task:
+                                type: string
+                              checked:
+                                type: boolean
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                                 
+
+  /get_todo/{todoId}:
+    get:
+      parameters:
+        - in: path
+          name: todoId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The todoId
+      tags:
+        - Todo
+      summary: returns single todo
+      responses:
+        "200": # status code
+          description: "returns an array of objects"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      _id : 
+                          type: string
+                      title:
+                        type: string
+                      tasks:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            task:
+                              type: string
+                            checked:
+                              type: boolean
+                "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string  
+  
+  /create_todo:
+    post:
+      tags:
+        - Todo
+      summary: Add new Todo
+      consumes : 
+        - application/json
+      produces : 
+        - applications/json
+      requestBody:
+        required : true
+        content : 
+          application/json :
+           schema:
+             type : object
+             properties : 
+               title : 
+                 type : string
+               tasks : 
+                 type : array
+                 items:
+                   type : object
+                   properties :  
+                      task : 
+                        type : string
+                      checked :
+                        type : boolean     
+                        default : false 
+      responses:
+        "200": # status code
+          description: "returns an object"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                        _id : 
+                          type: string
+                        title:
+                          type: string
+                        tasks:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              task:
+                                type: string
+                              checked:
+                                type: boolean
+                                default : false 
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                      
+
+  /delete_todo/{totoId}:
+    delete:
+      parameters:
+        - in: path
+          name: todoId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The todo Id
+      tags:
+        - Todo
+      summary: returns delete message
+      responses:
+        "201": # status code
+          description: "returns an object"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string                    
+
+  #  Task
+
+  /create_task:
+    post:
+      tags:
+        - Task
+      summary: Add one or more task
+      consumes : 
+        - application/json
+      produces : 
+        - applications/json
+      requestBody:
+        required : true
+        content : 
+          application/json :
+            schema :
+             type : object
+             properties : 
+              todoId : 
+                type : string
+              tasks : 
+                type : array
+                items : 
+                  type : object
+                  properties: 
+                    task : 
+                      type : string
+                    checked :
+                      type : boolean 
+                      default : false
+      responses:
+        "201": # status code
+          description: "Returns success message"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string 
+        "400":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+  
+  /update_task:
+    put:
+      tags:
+        - Task
+      summary: returns all todos
+      consumes : 
+        - application/json
+      produces : 
+        - applications/json
+      requestBody:
+        required : true
+        content : 
+          application/json :
+           schema:
+             type : object
+             properties : 
+               todoId : 
+                 type : string
+               taskId : 
+                 type : string
+               task : 
+                 type : string    
+      responses:
+        "201": # status code
+          description: "returns an array of objects"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message: 
+                    type: string                 
+        "400": # status code
+          description: "Bad request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message: 
+                    type: string                 
+        "404": # status code
+          description: "Not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message: 
+                    type: string                 
+        "500": # status code
+          description: "Internal Server Error"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message: 
+                    type: string                 
+  
+  /delete_task/{todoId}/{taskId}:
+    delete:
+      parameters:
+        - in: path
+          name: todoId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The todo Id
+        - in: path
+          name: taskId # Note the name is the same as in the path
+          required: true
+          schema:
+            type: string
+          description: The task Id
+      tags:
+        - Task
+      summary: returns delete message
+      responses:
+        "202": # status code
+          description: All good success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    default : false
+                  message:
+                    type: string
