@@ -3,8 +3,7 @@ const todoModel = require("../model/todoModel.js");
 
 //  add new todo
 const create_todo = async (req, res) => {
-  const title = req.body.title;
-  const tasks = req.body.tasks;
+  const { title, tasks } = req.body.title;
   const todoInfo = new todoModel({
     title,
     tasks,
@@ -13,15 +12,15 @@ const create_todo = async (req, res) => {
     const result = await todoInfo.save();
     res.status(201).json({ success: true, data: result });
   } catch (error) {
-    /// validation error
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ success: false, message: error.message });
-    }
     // dublicate key error
     if (error.code === 11000) {
       return res
         .status(400)
         .json({ success: false, message: "Title Shoule Be Unique" });
+    }
+    /// validation error
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: error.message });
     }
     // internal server error
     res.status(500).json({ success: false, message: error.message });
@@ -63,6 +62,49 @@ const get_todo = async (req, res) => {
   }
 };
 
+// update todo title
+const update_todo_title = async (req, res) => {
+  const { todoId, title } = req.body;
+  try {
+    const result = await todoModel.findByIdAndUpdate(
+      todoId,
+      { title },
+      { runValidators: true }
+    );
+    if (result) {
+      return res.status(201).json({
+        success: true,
+        message: "successfult updated the todo title",
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        message: "The todo in not avalilable",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    // dublicate key error
+    if (error.code === 11000) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Title Shoule Be Unique" });
+    }
+    /// validation error
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+    /// show error if _id is invalid
+    if (error.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        message: `Resource not found , Invalid ${error.path}`,
+      });
+    }
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // delete todo
 const delete_todo = async (req, res) => {
   const { totoId } = req.params;
@@ -91,125 +133,10 @@ const delete_todo = async (req, res) => {
   }
 };
 
-//create task/or multiple task
-const create_task = async (req, res) => {
-  const todoId = req.body.todoId;
-  const tasksArr = req.body.tasks;
-
-  if (!todoId || !tasksArr) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid request todoId and tasks are required",
-    });
-  }
-
-  try {
-    const todo = await todoModel.findById(todoId);
-    if (todo) {
-      todo.tasks.push(...tasksArr);
-      await todo.save();
-      // status code for creating the resource
-      res
-        .status(201)
-        .json({ success: false, message: "successfuly added new task" });
-    } else {
-      // 404 for not found
-      res.status(404).json({ success: false, message: "Not found" });
-    }
-  } catch (error) {
-    /// validation error
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ success: false, message: error.message });
-    }
-    /// show error if _id is invalid
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message: `Resource not found , Invalid ${error.path}`,
-      });
-    }
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
-
-// delete task
-const delete_task = async (req, res) => {
-  const { todoId, taskId } = req.params;
-  if (!todoId || !taskId) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid request todoId and taskId are required",
-    });
-  }
-  try {
-    const result = await todoModel.findOneAndUpdate(
-      { id: todoId, "tasks._id": taskId },
-      { $pull: { tasks: { _id: taskId } } }
-    );
-    if (result) {
-      res
-        .status(201) // 202 is from accepeted
-        .json({ success: true, message: "successfuly removed the task" });
-    } else {
-      // 404 for not found
-      res.status(404).json({ success: false, message: "Resource Not found" });
-    }
-  } catch (error) {
-    /// show error if _id is invalid
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message: `Resource not found , Invalid ${error.path}`,
-      });
-    }
-    res.statsu(500).json({ success: false, message: error.message });
-  }
-};
-
-// update task
-const update_task = async (req, res) => {
-  const todoId = req.body.todoId;
-  const taskId = req.body.taskId;
-  const task = req.body.task;
-
-  if (!todoId || !taskId || !task) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid request  todoId, taskId and task are required",
-    });
-  }
-
-  try {
-    const result = await todoModel.findOneAndUpdate(
-      { _id: todoId, "tasks._id": taskId },
-      { $set: { "tasks.$.task": task } }
-    );
-    if (result) {
-      return res
-        .status(201)
-        .json({ success: true, message: "Successfuly Updated" });
-    } else {
-      // 404 for not found
-      return res.status(404).json({ success: true, message: "Not found" });
-    }
-  } catch (error) {
-    /// show error if _id is invalid
-    if (error.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        message: `Resource not found , Invalid ${error.path}`,
-      });
-    }
-    return res.status(500).json({ success: false, message: error.message });
-  }
-};
-
 module.exports = {
   create_todo,
   get_todo,
   get_todos,
+  update_todo_title,
   delete_todo,
-  create_task,
-  delete_task,
-  update_task,
 };

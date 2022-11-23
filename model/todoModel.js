@@ -16,7 +16,10 @@ const todoSchema = new Schema({
         type: String,
         required: [true, "Please Enter Task"],
       },
-      checked: { type: Boolean, default: false },
+      checked: {
+        type: Boolean,
+        default: false,
+      },
     }),
   ],
 });

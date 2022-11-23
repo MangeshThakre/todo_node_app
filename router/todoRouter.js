@@ -4,11 +4,15 @@ const {
   create_todo,
   get_todo,
   get_todos,
+  update_todo_title,
   delete_todo,
+} = require("../controller/todoController.js");
+
+const {
   create_task,
   delete_task,
   update_task,
-} = require("../controller/todoController.js");
+} = require("../controller/taskController.js");
 
 // POST
 
@@ -23,6 +27,7 @@ todoRouter.get("/get_todo/:todoId", get_todo);
 // PUT
 
 todoRouter.put("/update_task", update_task);
+todoRouter.put("/update_todo_title", update_todo_title);
 
 // DELETE
 
