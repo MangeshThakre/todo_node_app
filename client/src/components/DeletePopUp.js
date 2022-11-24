@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState } from "react";
 function DeletePopUp({ todoData, setTodoData, deletePopUp, setDeletePopUp }) {
   const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const URL = process.env.REACT_APP_URL;
 
   const currentTodo = todoData.find((e) => e._id === deletePopUp.todoId);
   // delete task
@@ -12,7 +13,7 @@ function DeletePopUp({ todoData, setTodoData, deletePopUp, setDeletePopUp }) {
     try {
       const response = await axios({
         method: "delete",
-        url: `/api/delete_task/${deletePopUp.todoId}/${deletePopUp.taskId}`,
+        url: `${URL}/api/delete_task/${deletePopUp.todoId}/${deletePopUp.taskId}`,
       });
       const data = response.data;
       const newTasks = currentTodo.tasks.filter(
@@ -40,7 +41,7 @@ function DeletePopUp({ todoData, setTodoData, deletePopUp, setDeletePopUp }) {
     try {
       const response = await axios({
         method: "delete",
-        url: `/api/delete_todo/${deletePopUp.todoId}`,
+        url: `${URL}/api/delete_todo/${deletePopUp.todoId}`,
       });
       const data = response.data;
       const newTodoData = todoData.filter(

@@ -7,6 +7,7 @@ function TaskList({ currentTask, currentTodo }) {
     useContext(TodoContext);
   const [isEdit, setIsEdit] = useState(false);
   const [task, setTask] = useState(currentTask);
+  const [checked, setCheckecd] = useState(currentTask.checked);
   const [istaskLoading, setIsTaskLoading] = useState(false);
   const inputRef = useRef(null);
 
@@ -31,6 +32,7 @@ function TaskList({ currentTask, currentTodo }) {
           ? { _id: currentTask._id, task: task.task, ckecked: task.checked }
           : e
       );
+
       const newCurrentTodo = {
         _id: currentTodo._id,
         title: currentTodo.title,
@@ -39,9 +41,9 @@ function TaskList({ currentTask, currentTodo }) {
       const newTodoData = todoData.map((todo) =>
         todo._id === currentTodo._id ? newCurrentTodo : todo
       );
-      console.log(newTodoData);
       setTodoData(newTodoData);
       setIsEdit(false);
+      setCheckecd(task.checked);
       setIsTaskLoading(false);
     } catch (error) {
       setIsEdit(false);
@@ -54,7 +56,7 @@ function TaskList({ currentTask, currentTodo }) {
   }, [isEdit]);
 
   return (
-    <li key={task._id} className="py-3 sm:pb-4   md:px-10  ">
+    <li key={task._id} className="    md:px-10  ">
       {istaskLoading ? (
         <div className="absolute w-full flex justify-center items-center ">
           <img className="h-12 w-12" src={loading} alt="loding" />
@@ -65,9 +67,22 @@ function TaskList({ currentTask, currentTodo }) {
         onSubmit={(e) => handleEditTask(e)}
       >
         <div className="w-full flex  gap-8">
+          {/* checked */}
           <div className="flex items-center">
-            {currentTask.checked ? (
-              <>
+            {checked ? (
+              <button
+                disabled={istaskLoading}
+                className="h-8 w-8   hover:bg-gray-600  rounded-full flex items-center justify-center"
+                type="submit"
+                onClick={() => {
+                  setTask((preVal) => {
+                    return {
+                      task: preVal.task,
+                      checked: false,
+                    };
+                  });
+                }}
+              >
                 <svg
                   className="w-4 h-4  md:w-6 md:h-6 cursor-pointer text-green-400"
                   data-tooltip-target="tooltip-default"
@@ -82,19 +97,24 @@ function TaskList({ currentTask, currentTodo }) {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                <div
-                  id="tooltip-default"
-                  role="tooltip"
-                  className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700"
-                >
-                  unCheck
-                  <div className="tooltip-arrow" data-popper-arrow></div>
-                </div>
-              </>
+              </button>
             ) : (
-              <>
+              <button
+                className="h-8 w-8   hover:bg-gray-600  rounded-full flex items-center justify-center"
+                disabled={istaskLoading}
+                type="submit"
+                onClick={() => {
+                  setTask((preVal) => {
+                    return {
+                      task: preVal.task,
+                      checked: true,
+                    };
+                  });
+                  handleEditTask();
+                }}
+              >
                 <svg
-                  className="w-4 h-4  md:w-6 md:h-6 cursor-pointer text-red-400"
+                  className="w-6 h-6  md:w-6 md:h-6 cursor-pointer text-red-400"
                   data-tooltip-target="tooltip-animation"
                   data-tooltip-trigger="hover"
                   fill="currentColor"
@@ -107,17 +127,11 @@ function TaskList({ currentTask, currentTodo }) {
                     clipRule="evenodd"
                   ></path>
                 </svg>
-                <div
-                  id="tooltip-animation"
-                  role="tooltip"
-                  className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700"
-                >
-                  Check
-                  <div className="tooltip-arrow" data-popper-arrow></div>
-                </div>
-              </>
+              </button>
             )}
           </div>
+          {/* checked  end*/}
+
           {/* input field */}
           <div className="flex-1 min-w-0">
             <input
@@ -138,6 +152,7 @@ function TaskList({ currentTask, currentTodo }) {
                   ? "block md:py-2.5 py-1 px-0 w-full text-lg text-gray-300 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
                   : "block py-2.5 px-0 w-full text-lg text-gray-300 bg-transparent border-0   appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
               }
+              style={!checked ? { fontWeight: "400", color: "white" } : null}
               placeholder="Enter task"
               disabled={!isEdit}
               required

@@ -422,18 +422,16 @@ paths:
              properties : 
               todoId : 
                 type : string
-              tasks : 
-                type : array
-                items : 
-                  type : object
-                  properties: 
-                    task : 
-                      type : string
-                    checked :
-                      type : boolean 
-                      default : false
+              taskObj : 
+                type : object
+                properties: 
+                   task : 
+                     type : string
+                   checked :
+                     type : boolean 
+                     default : false
       responses:
-        "201": # status code
+        "200": # status code
           description: "Returns success message"
           content:
             application/json:
@@ -442,8 +440,16 @@ paths:
                 properties:
                   success:
                     type: boolean
-                  message:
-                    type: string 
+                  data:
+                    type : object
+                    properties:
+                       _id :
+                         type : string 
+                       task : 
+                         type : string
+                       checked :
+                         type : boolean 
+                         default : false 
         "400":
           description: Not found
           content:

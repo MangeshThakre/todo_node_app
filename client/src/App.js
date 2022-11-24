@@ -4,11 +4,12 @@ import Todo from "./components/Todo";
 import { useContext, useEffect, useState } from "react";
 import DeletePopUp from "./components/DeletePopUp";
 import AddTodo from "./components/AddTodo.js";
-
+import loadingSvg from "./assets/loading.svg";
 import axios from "axios";
 import { TodoContext } from "./context/Contex";
 
 function App() {
+  const URL = process.env.REACT_APP_URL;
   const [showTodoList, setShowTodoList] = useState(null);
   const { todoData, setTodoData, deletePopUp, setDeletePopUp } =
     useContext(TodoContext);
@@ -17,7 +18,7 @@ function App() {
   async function getAllTodoDate() {
     setTodoDataLoading(true);
     try {
-      const response = await axios.get("/api/get_todos");
+      const response = await axios.get(URL + "/api/get_todos");
       const data = response.data.data;
       setTodoData(data.reverse());
       setTodoDataLoading(false);
@@ -40,17 +41,21 @@ function App() {
       >
         <div style={{ paddingTop: "4rem", paddingBottom: "4xrem" }}>
           <AddTodo />
-          {todoDataLoading
-            ? "...loading"
-            : todoData.map((todo, i) => (
-                <Todo
-                  key={todo._id}
-                  todo={todo}
-                  setShowTodoList={setShowTodoList}
-                  showTodoList={showTodoList}
-                  i={i}
-                />
-              ))}
+          {todoDataLoading ? (
+            <div className="w-full  flex justify-center">
+              <img src={loadingSvg} alt="loading" />
+            </div>
+          ) : (
+            todoData.map((todo, i) => (
+              <Todo
+                key={todo._id}
+                todo={todo}
+                setShowTodoList={setShowTodoList}
+                showTodoList={showTodoList}
+                i={i}
+              />
+            ))
+          )}
         </div>
       </div>
 

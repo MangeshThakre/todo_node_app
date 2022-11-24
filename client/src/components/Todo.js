@@ -4,14 +4,13 @@ import axios from "axios";
 import { TodoContext } from "../context/Contex";
 import AddTask from "./AddTask.js";
 
-function Todo({ todo, i, showTodoList, setShowTodoList }) {
+function Todo({ todo, showTodoList, setShowTodoList }) {
   const { todoData, setTodoData, deletePopUp, setDeletePopUp } =
     useContext(TodoContext);
   const [isTodoTitleEdit, setIsTodoTitleEdit] = useState(false);
   const [currentTodo, setCurrentTodo] = useState(todo);
   const titleInputRef = useRef(null);
   const [isTitleLoading, setIstitleLoading] = useState(false);
-
   async function handleUpdateTodoTitle(e) {
     e.preventDefault();
     setIstitleLoading(true);
@@ -26,13 +25,13 @@ function Todo({ todo, i, showTodoList, setShowTodoList }) {
         return todo._id === currentTodo._id ? currentTodo : todo;
       });
       setTodoData(newtodoData);
-      console.log(newtodoData);
       setIsTodoTitleEdit(false);
       setIstitleLoading(false);
     } catch (error) {
       setIstitleLoading(false);
     }
   }
+
   useEffect(() => {
     if (isTodoTitleEdit) titleInputRef.current.focus();
   }, [isTodoTitleEdit]);
@@ -55,21 +54,38 @@ function Todo({ todo, i, showTodoList, setShowTodoList }) {
           className="flex items-center justify-start w-full p-5 font-medium text-left"
         >
           {/*  arrow svg  */}
-          <svg
-            data-accordion-icon
-            className="w-6 h-6 shrink-0 mr-3"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"
-            ></path>
-          </svg>
+          {showTodoList === currentTodo._id ? (
+            <svg
+              className="w-6 h-6 shrink-0 mr-3    text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 11l3-3m0 0l3 3m-3-3v8m0-13a9 9 0 110 18 9 9 0 010-18z"
+              ></path>
+            </svg>
+          ) : (
+            <svg
+              data-accordion-icon
+              className="w-6 h-6 shrink-0 mr-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M15 13l-3 3m0 0l-3-3m3 3V8m0 13a9 9 0 110-18 9 9 0 010 18z"
+              ></path>
+            </svg>
+          )}
           {/*  arrwo svg*/}
 
           {/* todo title */}
@@ -96,7 +112,14 @@ function Todo({ todo, i, showTodoList, setShowTodoList }) {
                 defaultValue={todo.title}
               />
             ) : (
-              <span className=" block py-2.5 px-0 text-lg w-full text-gray-300 bg-transparent border-0   appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer">
+              <span
+                className=" block py-2.5 px-0 text-lg w-full text-gray-300 bg-transparent border-0   appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
+                style={
+                  showTodoList === currentTodo._id
+                    ? { color: "white", fontWeight: "600" }
+                    : null
+                }
+              >
                 {currentTodo.title}
               </span>
             )}
@@ -177,14 +200,10 @@ function Todo({ todo, i, showTodoList, setShowTodoList }) {
         <div className="p-5 font-light border border-b-0  border-gray-700">
           <ul className="max-w-full divide-y divide-gray-200 dark:divide-gray-700">
             {todo.tasks.map((task) => (
-              <TaskList
-                key={task._id}
-                currentTask={task}
-                currentTodo={currentTodo}
-              />
+              <TaskList key={task._id} currentTask={task} currentTodo={todo} />
             ))}
+            <AddTask currentTodo={todo} />
           </ul>
-          <AddTask />
         </div>
       ) : null}
       {/* list end */}

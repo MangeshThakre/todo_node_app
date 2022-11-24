@@ -4,9 +4,8 @@ const todoModel = require("../model/todoModel.js");
 //create single task / multiple task
 const create_task = async (req, res) => {
   const todoId = req.body.todoId;
-  const tasksArr = req.body.tasks;
-
-  if (!todoId || !tasksArr) {
+  const taskObj = req.body.taskObj;
+  if (!todoId || !taskObj) {
     return res.status(400).json({
       success: false,
       message: "Invalid request todoId and tasks are required",
@@ -16,14 +15,15 @@ const create_task = async (req, res) => {
   try {
     const result = await todoModel.findByIdAndUpdate(
       todoId,
-      { $push: { tasks: { $each: tasksArr } } },
-      { runValidators: true }
+      { $push: { tasks: taskObj } },
+      { new: true, runValidators: true }
     );
     if (result) {
       // status code for creating the resource
-      res
-        .status(201)
-        .json({ success: false, message: "successfuly added new task" });
+      res.status(200).json({
+        success: true,
+        data: result.tasks[result.tasks.length - 1],
+      });
     } else {
       // 404 for not found
       res.status(404).json({ success: false, message: "Not found" });
