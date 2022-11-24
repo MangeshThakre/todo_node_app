@@ -1,13 +1,15 @@
-import React from "react";
-import { useState } from "react";
+import { useState, useContext, useRef, useEffect } from "react";
 import axios from "axios";
 import loading from "../assets/loading.svg";
-function TaskList({ task, todoId }) {
+import { TodoContext } from "../context/Contex.js";
+function TaskList({ currentTask, currentTodo }) {
+  const { todoData, setTodoData, deletePopUp, setDeletePopUp } =
+    useContext(TodoContext);
   const [isEdit, setIsEdit] = useState(false);
-  const [currentTask, setCurrentTask] = useState(task);
+  const [task, setTask] = useState(currentTask);
   const [istaskLoading, setIsTaskLoading] = useState(false);
-  const URL = process.env.REACT_APP_URL;
-  console.log(todoId);
+  const inputRef = useRef(null);
+
   // edit task
   async function handleEditTask(e) {
     e.preventDefault();
@@ -17,30 +19,39 @@ function TaskList({ task, todoId }) {
         method: "put",
         url: "/api/update_task",
         data: {
-          todoId,
-          taskId: task._id,
-          checked: currentTask.checked,
-          task: currentTask.task,
+          todoId: currentTodo._id,
+          taskId: currentTask._id,
+          checked: task.checked,
+          task: task.task,
         },
       });
       const data = response.data;
+      const newTasks = currentTodo.tasks.map((e) =>
+        currentTask._id === e._id
+          ? { _id: currentTask._id, task: task.task, ckecked: task.checked }
+          : e
+      );
+      const newCurrentTodo = {
+        _id: currentTodo._id,
+        title: currentTodo.title,
+        tasks: newTasks,
+      };
+      const newTodoData = todoData.map((todo) =>
+        todo._id === currentTodo._id ? newCurrentTodo : todo
+      );
+      console.log(newTodoData);
+      setTodoData(newTodoData);
       setIsEdit(false);
       setIsTaskLoading(false);
     } catch (error) {
+      setIsEdit(false);
       setIsTaskLoading(false);
     }
   }
 
-  // delete task
-  async function handleDeleteTask() {
-    try {
-      const response = await axios({
-        method: "delete",
-        url: `/api/delete_task/${todoId}/${task._id}`,
-      });
-      const data = response.data;
-    } catch (error) {}
-  }
+  useEffect(() => {
+    if (isEdit) inputRef.current.focus();
+  }, [isEdit]);
 
   return (
     <li key={task._id} className="py-3 sm:pb-4   md:px-10  ">
@@ -107,19 +118,21 @@ function TaskList({ task, todoId }) {
               </>
             )}
           </div>
+          {/* input field */}
           <div className="flex-1 min-w-0">
             <input
               type="text"
+              ref={inputRef}
               onChange={(e) =>
-                setCurrentTask((preVal) => {
+                setTask((preVal) => {
                   return {
                     task: e.target.value,
                     checked: preVal.checked,
                   };
                 })
               }
-              name="floating_email"
               id="floating_email"
+              autoComplete="off"
               className={
                 isEdit
                   ? "block md:py-2.5 py-1 px-0 w-full text-lg text-gray-300 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer"
@@ -128,9 +141,10 @@ function TaskList({ task, todoId }) {
               placeholder="Enter task"
               disabled={!isEdit}
               required
-              defaultValue={currentTask.task}
+              defaultValue={task.task}
             />
           </div>
+          {/* input field */}
         </div>
         {/* edit delete button */}
         <div className="inline-flex   gap-4 items-center text-base font-semibold text-white">
@@ -165,6 +179,7 @@ function TaskList({ task, todoId }) {
             </>
           ) : (
             <>
+              {/* edit button */}
               <svg
                 onClick={() => setIsEdit((preVal) => !preVal)}
                 className="w-6 h-6 cursor-pointer  text-green-500"
@@ -181,8 +196,18 @@ function TaskList({ task, todoId }) {
                   clipRule="evenodd"
                 ></path>
               </svg>
+              {/* edit button end */}
+              {/* delete button  */}
               <svg
                 data-tooltip-target="tooltip-default"
+                onClick={() =>
+                  setDeletePopUp({
+                    display: true,
+                    taskId: currentTask._id,
+                    todoId: currentTodo._id,
+                    type: "Task",
+                  })
+                }
                 data-tooltip-trigger="hover"
                 className="w-6 h-6    cursor-pointer text-red-500"
                 fill="currentColor"
@@ -195,25 +220,9 @@ function TaskList({ task, todoId }) {
                   clipRule="evenodd"
                 ></path>
               </svg>
+              {/* delete button end */}
             </>
           )}
-          <div
-            id="tooltip-animation"
-            role="tooltip"
-            className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700"
-          >
-            Edit Task
-            <div className="tooltip-arrow" data-popper-arrow></div>
-          </div>
-
-          <div
-            id="tooltip-default"
-            role="tooltip"
-            className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip dark:bg-gray-700"
-          >
-            Delete Task
-            <div className="tooltip-arrow" data-popper-arrow></div>
-          </div>
         </div>
         {/* edit delete button  end */}
       </form>

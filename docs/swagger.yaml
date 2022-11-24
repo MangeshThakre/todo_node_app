@@ -292,8 +292,8 @@ paths:
                title : 
                  type : string 
       responses:
-        "200": # status code
-          description: "returns an object"
+        "201":
+          description: returns an object
           content:
             application/json:
               schema:
@@ -301,25 +301,9 @@ paths:
                 properties:
                   success:
                     type: boolean
-                  data:
-                    type: object
-                    properties:
-                        _id : 
-                          type: string
-                        title:
-                          type: string
-                        tasks:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              id:
-                                type: string
-                              task:
-                                type: string
-                              checked:
-                                type: boolean
-                                default : false 
+                    default : true
+                  message:
+                    type: string
         "400":
           description: Bad Request
           content:

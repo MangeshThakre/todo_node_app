@@ -3,11 +3,12 @@ const todoModel = require("../model/todoModel.js");
 
 //  add new todo
 const create_todo = async (req, res) => {
-  const { title, tasks } = req.body.title;
+  const { title, tasks } = req.body;
   const todoInfo = new todoModel({
     title,
     tasks,
   });
+
   try {
     const result = await todoInfo.save();
     res.status(201).json({ success: true, data: result });
