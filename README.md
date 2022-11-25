@@ -5,6 +5,6 @@
 </p>
 
 
-[👉 Front-end source code ](https://github.com/MangeshThakre/todo_app_frontendl , "fonnt source code")
+[👉 Front-end source code ](https://github.com/MangeshThakre/todo_app_frontendl)
 
-[👉 Swagger api documentaion](https://todo-mern-app-fsjs.netlify.app/api-docs , "api documentation")
+[👉 Swagger api documentaion](https://todo-mern-app-fsjs.netlify.app/api-docs)
