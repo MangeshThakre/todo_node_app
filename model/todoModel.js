@@ -6,7 +6,6 @@ const todoSchema = new Schema({
     type: String,
     required: [true, "Please Enter Todo Title"],
     maxlength: [25, "Title should be less then or equal to 25 characters "],
-    minLength: [3, "Title should be more then or equal to 3 characters "],
     trim: true,
     unique: true,
   },

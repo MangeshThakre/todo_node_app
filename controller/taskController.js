@@ -61,7 +61,7 @@ const delete_task = async (req, res) => {
     if (result) {
       res
         .status(201) // 202 is from accepeted
-        .json({ success: true, message: "successfuly removed the task" });
+        .json({ success: true, message: "successfully removed the task" });
     } else {
       // 404 for not found
       res.status(404).json({ success: false, message: "Resource Not found" });
@@ -97,7 +97,7 @@ const update_task = async (req, res) => {
     if (result) {
       return res
         .status(201)
-        .json({ success: true, message: "Successfuly Updated" });
+        .json({ success: true, message: "successfully Updated task" });
     } else {
       // 404 for not found
       return res.status(404).json({ success: true, message: "Not found" });

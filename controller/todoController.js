@@ -75,7 +75,7 @@ const update_todo_title = async (req, res) => {
     if (result) {
       return res.status(201).json({
         success: true,
-        message: "successfult updated the todo title",
+        message: "successfully updated the todo title",
       });
     } else {
       res.status(404).json({
@@ -114,7 +114,7 @@ const delete_todo = async (req, res) => {
     if (result) {
       res.status(200).json({
         success: false,
-        message: "Successfly deleted the todo",
+        message: "successfully deleted the todo",
       });
     } else {
       res.status(404).json({
