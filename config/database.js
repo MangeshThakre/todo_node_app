@@ -6,7 +6,8 @@ const mongoDbconnection = () => {
     .connect(MONGODB_URL)
     .then((data) =>
       console.log(`successfuly connected to DB ${data.connection.host}`)
-    );
+    )
+    .catch((error) => console.log(error));
 };
 
 module.exports = mongoDbconnection;
