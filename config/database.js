@@ -3,12 +3,7 @@ const MONGODB_URL = process.env.MONGODB_URL;
 
 const mongoDbconnection = () => {
   mongoose
-    .connect(MONGODB_URL, {
-      //must add in order to not get any error masseges:
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-      useCreateIndex: true,
-    })
+    .connect(MONGODB_URL)
     .then((data) =>
       console.log(`successfuly connected to DB ${data.connection.host}`)
     );
