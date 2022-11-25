@@ -11,10 +11,10 @@ const server = app.listen(PORT, () =>
 );
 
 // unhandled promiss rejection
-// process.on("unhandledRejection", (err) => {
-//   console.log(`Error: ${err.message}`);
-//   console.log(`shutting down the server due to unhandled promiss rejection`);
-//   server.close(() => {
-//     process.exit();
-//   });
-// });
+process.on("unhandledRejection", (err) => {
+  console.log(`Error: ${err.message}`);
+  console.log(`shutting down the server due to unhandled promiss rejection`);
+  server.close(() => {
+    process.exit();
+  });
+});
