@@ -13,7 +13,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "./view")));
 
 // routes
-app.use("/api/v1", todoRouter);
+app.use("/v1", todoRouter);
 
 // swagger
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

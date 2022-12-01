@@ -17,7 +17,7 @@ const {
 
 // todo
 todoRouter
-  .route("/todo")
+  .route("/todo/:userId")
   .get(getTodo)
   .post(createTodo)
   .delete(deleteTodo)

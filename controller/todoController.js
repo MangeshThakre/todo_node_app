@@ -3,7 +3,8 @@ const todoModel = require("../model/todoModel.js");
 
 //  add new todo
 const createTodo = async (req, res) => {
-  const { userId, title, tasks } = req.body;
+  const { userId } = req.params;
+  const { title, tasks } = req.body;
   const todoInfo = new todoModel({
     userId,
     title,
