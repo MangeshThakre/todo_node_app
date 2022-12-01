@@ -1,11 +1,9 @@
-const { findOneAndUpdate } = require("../model/todoModel.js");
 const todoModel = require("../model/todoModel.js");
 
 //create single task / multiple task
 const create_task = async (req, res) => {
-  const todoId = req.body.todoId;
-  const taskObj = req.body.taskObj;
-  if (!todoId || !taskObj) {
+  const { todoId, tasks } = req.body;
+  if (!todoId || !tasks) {
     return res.status(400).json({
       success: false,
       message: "Invalid request todoId and tasks are required",
@@ -15,7 +13,7 @@ const create_task = async (req, res) => {
   try {
     const result = await todoModel.findByIdAndUpdate(
       todoId,
-      { $push: { tasks: taskObj } },
+      { $push: { tasks: { $each: tasks } } },
       { new: true, runValidators: true }
     );
     if (result) {
@@ -35,10 +33,6 @@ const create_task = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Title Shoule Be Unique" });
     }
-    /// validation error
-    if (error.name === "ValidationError") {
-      return res.status(400).json({ success: false, message: error.message });
-    }
     /// show error if _id is invalid
     if (error.name === "CastError") {
       return res.status(400).json({
@@ -52,7 +46,12 @@ const create_task = async (req, res) => {
 
 // delete task
 const delete_task = async (req, res) => {
-  const { todoId, taskId } = req.params;
+  const { todoId, taskId } = req.body;
+  if (!todoId || !taskId) {
+    return res
+      .status(400)
+      .json({ success: false, message: "todoId and taskId both are required" });
+  }
   try {
     const result = await todoModel.findOneAndUpdate(
       { id: todoId, "tasks._id": taskId },
@@ -81,10 +80,10 @@ const delete_task = async (req, res) => {
 // update task
 const update_task = async (req, res) => {
   const { todoId, taskId, task, checked } = req.body;
-  if (!todoId || !taskId || !task) {
+  if (!todoId || !taskId) {
     return res.status(400).json({
       success: false,
-      message: "Invalid request  todoId, taskId and task are required",
+      message: "Invalid request  todoId, taskId are required",
     });
   }
 

@@ -10,11 +10,11 @@ const server = app.listen(PORT, () =>
   console.log(`server is listning at http://localhost:${PORT}`)
 );
 
-// unhandled promiss rejection
-process.on("unhandledRejection", (err) => {
-  console.log(`Error: ${err.message}`);
-  console.log(`shutting down the server due to unhandled promiss rejection`);
-  server.close(() => {
-    process.exit();
-  });
-});
+// // unhandled promiss rejection
+// process.on("unhandledRejection", (err) => {
+//   console.log(`Error: ${err.message}`);
+//   console.log(`shutting down the server due to unhandled promiss rejection`);
+//   server.close(() => {
+//     process.exit();
+//   });
+// });
