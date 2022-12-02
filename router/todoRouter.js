@@ -4,7 +4,7 @@ const {
   createTodo,
   getTodo,
   getTodos,
-  updateTodoTitle,
+  updateTodo,
   deleteTodo,
 } = require("../controller/todoController.js");
 
@@ -17,14 +17,14 @@ const {
 
 // todo
 todoRouter
-  .route("/todo/:userId")
+  .route("/todo")
   .get(getTodo)
   .post(createTodo)
   .delete(deleteTodo)
-  .put(updateTodoTitle);
+  .patch(updateTodo);
 
 // todos
-todoRouter.get("/todos/userId/:userId", getTodos);
+todoRouter.get("/todos/:userId", getTodos);
 
 // Task
 todoRouter

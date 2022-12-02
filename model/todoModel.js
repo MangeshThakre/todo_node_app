@@ -31,7 +31,7 @@ const todoSchema = new Schema(
   { timestamps: true }
 );
 
-todoSchema.index({ title: "text", "tasks.task": "text" });
+todoSchema.index({ "$**": "text" });
 const todoModel = mongoose.model("todo", todoSchema);
 
 module.exports = todoModel;

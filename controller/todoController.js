@@ -1,10 +1,8 @@
-const { response } = require("express");
 const todoModel = require("../model/todoModel.js");
-
+const moment = require("moment");
 //  add new todo
 const createTodo = async (req, res) => {
-  const { userId } = req.params;
-  const { title, tasks } = req.body;
+  const { userId, title, tasks } = req.body;
   const todoInfo = new todoModel({
     userId,
     title,
@@ -67,18 +65,19 @@ const getTodo = async (req, res) => {
 };
 
 // update todo title
-const updateTodoTitle = async (req, res) => {
-  const { todoId, title } = req.body;
+const updateTodo = async (req, res) => {
+  const { todoId, title, isImportant } = req.body;
   try {
     const result = await todoModel.findByIdAndUpdate(
       todoId,
-      { title },
+      { title, isImportant },
       { runValidators: true }
     );
+
     if (result) {
       return res.status(201).json({
         success: true,
-        message: "successfully updated the todo title",
+        message: "successfully updated",
       });
     } else {
       res.status(404).json({
@@ -117,9 +116,8 @@ const deleteTodo = async (req, res) => {
       .status(400)
       .json({ success: false, message: "todoId is required" });
   }
-
   try {
-    const result = await todoModel.findByIdAndDelete({ todoId });
+    const result = await todoModel.findByIdAndDelete(todoId);
     if (result) {
       res.status(200).json({
         success: false,
@@ -162,9 +160,26 @@ const getTodos = async (req, res) => {
     else if (req.query.isImportant === "false") isImportant = false;
   }
 
+  let from = null;
+  let to = null;
+  if (queryArr.includes("from") && req.query.from) {
+    from = new Date(req.query.from);
+  }
+  if (queryArr.includes("to") && req.query.to != "null") {
+    to = new Date(req.query.to);
+  } else {
+    to = new Date();
+  }
+
   const modelQuery = { userId };
   if (search) modelQuery["$text"] = { $search: search, $caseSensitive: false };
-  if (isImportant) modelQuery["isImportant"] = isImportant;
+  if (typeof isImportant === "boolean") modelQuery["isImportant"] = isImportant;
+  if (from) {
+    modelQuery["createdAt"] = {
+      $gte: from,
+      $lt: to,
+    };
+  }
 
   try {
     const result = await todoModel
@@ -180,6 +195,6 @@ module.exports = {
   createTodo,
   getTodo,
   getTodos,
-  updateTodoTitle,
+  updateTodo,
   deleteTodo,
 };

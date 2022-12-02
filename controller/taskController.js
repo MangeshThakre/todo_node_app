@@ -52,6 +52,7 @@ const delete_task = async (req, res) => {
       .status(400)
       .json({ success: false, message: "todoId and taskId both are required" });
   }
+
   try {
     const result = await todoModel.findOneAndUpdate(
       { id: todoId, "tasks._id": taskId },
